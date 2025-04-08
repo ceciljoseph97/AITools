@@ -60,9 +60,22 @@ class FGIsolationTool(customtkinter.CTk):
                     inputImg=i.read()
                     result=remove(inputImg)
                     o.write(result)
-            self.output_image=Image.open(output_path).resize((300,300))
-
-            self.output_photo =ImageTk.PhotoImage(self.output_image)
+            
+            # Open the image with transparency
+            self.output_image = Image.open(output_path)
+            
+            # Create a new image with off-white background
+            background = Image.new('RGBA', self.output_image.size, (245, 245, 245, 255))
+            
+            # Composite the transparent image over the background
+            final_image = Image.alpha_composite(background, self.output_image)
+            
+            # Save the full resolution image
+            final_image.convert('RGB').save(output_path, 'JPEG', quality=100)
+            
+            # Create preview for display
+            preview_image = final_image.resize((300,300))
+            self.output_photo = ImageTk.PhotoImage(preview_image)
             self.output_canvas.create_image(0,0,anchor=tk.NW, image=self.output_photo)
             self.browse_btn.configure(text="Select Image",command=self.browse_image,state='normal')
 
